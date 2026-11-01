@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import re
-import zipfile
 from io import BytesIO
 from urllib.parse import urlparse
 
@@ -131,26 +130,13 @@ async def image_handler(message: Message) -> None:
                 f"{ATTHEME_API_URL}/api/v1/generate", headers=headers, data=form
             ) as response:
                 if response.status == 200:
-                    package_data = await response.read()
-                    if not package_data:
+                    theme_data = await response.read()
+                    if not theme_data:
                         await status.edit_text("API bo‘sh fayl qaytardi. Keyinroq urinib ko‘ring.")
                         return
-                    try:
-                        with zipfile.ZipFile(BytesIO(package_data)) as package:
-                            theme_data = package.read("generated_theme.attheme")
-                            wallpaper_data = package.read("chat_wallpaper.jpg")
-                    except (zipfile.BadZipFile, KeyError):
-                        logger.exception("Theme API returned an invalid theme package")
-                        await status.edit_text("API noto‘g‘ri fayl paketi qaytardi.")
-                        return
-
                     await message.answer_document(
                         BufferedInputFile(theme_data, filename="generated_theme.attheme"),
-                        caption="✅ 1/2 — Tayyor tema. Telegram Android’da ochib qo‘llang.",
-                    )
-                    await message.answer_document(
-                        BufferedInputFile(wallpaper_data, filename="chat_wallpaper.jpg"),
-                        caption="🖼 2/2 — Shu rasmni Telegram’da chat foni sifatida alohida o‘rnating.",
+                        caption="✅ Tayyor! Ranglar va rasmli oboy bitta .attheme fayliga joylandi. Telegram Android’da ochib, temani qo‘llang.",
                     )
                     await status.delete()
                     return
