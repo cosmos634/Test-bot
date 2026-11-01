@@ -161,7 +161,7 @@ async def main() -> None:
         raise RuntimeError("BOT_TOKEN .env faylida sozlanmagan.")
     if not ATTTHOOK_API_KEY and not os.getenv("ATTHEME_API_KEY", "").strip():
         raise RuntimeError("ATTHEME_API_KEY .env faylida sozlanmagan.")
-    if not ATTHTHEME_API_URL:
+    if not ATTHEME_API_URL:
         raise RuntimeError("ATTHEME_API_URL .env faylida sozlanmagan.")
 
     bot = Bot(token=BOT_TOKEN)
