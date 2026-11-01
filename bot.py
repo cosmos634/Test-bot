@@ -159,7 +159,7 @@ async def fallback_handler(message: Message) -> None:
 async def main() -> None:
     if not BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN .env faylida sozlanmagan.")
-    if not ATTTHOOK_API_KEY and not os.getenv("ATTHEME_API_KEY", "").strip():
+    if not ATTHEME_API_KEY:
         raise RuntimeError("ATTHEME_API_KEY .env faylida sozlanmagan.")
     if not ATTHEME_API_URL:
         raise RuntimeError("ATTHEME_API_URL .env faylida sozlanmagan.")
