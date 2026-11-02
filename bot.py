@@ -132,7 +132,7 @@ async def generate_theme(
     image_bytes: bytes,
     image_filename: str,
     theme_name: str,
-) -> tuple[bytes, str]:
+) -> tuple[bytes, str, int, int]:
     headers = {"X-API-Key": ATTHEME_API_KEY}
     form = aiohttp.FormData()
     form.add_field(
@@ -173,7 +173,9 @@ async def generate_theme(
             filename = get_response_filename(
                 response.headers.get("Content-Disposition")
             )
-            return theme_bytes, filename
+            generation_time_ms = int(response.headers.get("X-Generation-Time-Ms", "0"))
+            color_key_count = int(response.headers.get("X-Color-Key-Count", "0"))
+            return theme_bytes, filename, generation_time_ms, color_key_count
 
 
 @dp.message(F.photo | F.document)
@@ -222,7 +224,7 @@ async def theme_name_handler(message: Message, state: FSMContext) -> None:
 
     status = await message.answer("🎨 Ranglar tahlil qilinmoqda va tema yaratilmoqda...")
     try:
-        theme_bytes, output_filename = await generate_theme(
+        theme_bytes, output_filename, generation_time_ms, color_key_count = await generate_theme(
             image_bytes=image_bytes,
             image_filename=image_filename,
             theme_name=theme_name,
@@ -231,6 +233,8 @@ async def theme_name_handler(message: Message, state: FSMContext) -> None:
             BufferedInputFile(theme_bytes, filename=output_filename),
             caption=(
                 f"✅ **{theme_name}** temasi tayyor!\n\n"
+                f"🎨 Rang kalitlari: **{color_key_count or 399} ta**\n"
+                f"⏱ Generatsiya vaqti: **{generation_time_ms / 1000:.2f} soniya**\n\n"
                 "Faylni Telegram Android’da ochib, temani qo‘llashingiz mumkin."
             ),
             parse_mode="Markdown",
